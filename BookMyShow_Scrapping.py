@@ -13,6 +13,19 @@ from requests.api import get
 # movie_code = "ET00319080" # Can be obtained from bookmyshow
 # cinema_type = "Carnival"
 
+codes = {
+    "mumbai": "mumbai",
+    "national captial region": "ncr",
+    "bengaluru": "bang",
+    "hyderabad": "hyd",
+    "chandigarh": "chd",
+    "pune": "pune",
+    "chennai": "chen",
+    "kolkata": "kolk",
+    "kochi": "koch"
+}
+
+
 def main(movie_name, location, date, cinema_type):
     base_url = "https://in.bookmyshow.com"
     headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36"}
@@ -20,8 +33,8 @@ def main(movie_name, location, date, cinema_type):
     date_formatted = "".join(date.split("/")[::-1])
     mov_name_formatted = "-".join(movie_name.lower().split())
     movie_code = get_movie_code(base_url, location, mov_name_formatted)
-
-    url = base_url + f"/buytickets/{mov_name_formatted}-{location.lower()}/movie-{location.lower()}-{movie_code}-MT/{date_formatted}"
+    location_code = codes[location.lower()]
+    url = base_url + f"/buytickets/{mov_name_formatted}-{location.lower()}/movie-{location_code}-{movie_code}-MT/{date_formatted}"
     
     it = 0
     while True:
@@ -44,6 +57,7 @@ def main(movie_name, location, date, cinema_type):
                 venue_name = venue.text.translate(translator)
                 if venue_name.split()[0].rstrip(":").lower() == cinema_type.lower():
                     print(base_url + venue.find("a", {"class": "__venue-name"})["href"])
+                    return
         print("Iteration", it)
         sleep(15)
 
@@ -101,10 +115,10 @@ if __name__ == "__main__":
     location = details[1]
     date = details[2]
     cinema_type = details[3]
-    # movie_name = "Spiderman No way Home"
-    # location = "Mumbai"
+    # movie_name = "Spider man No way Home"
+    # location = "kochi"
     # date = "16/12/2021"
     # cinema_type = "carnival"
-    main(movie_name, location, date, cinema_type)
+    # main(movie_name, location, date, cinema_type)
 
 
