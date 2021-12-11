@@ -96,15 +96,15 @@ def get_details():
 
 
 if __name__ == "__main__":
-    # details = get_details()
-    # movie_name = details[0]
-    # location = details[1]
-    # date = details[2]
-    # cinema_type = details[3]
-    movie_name = "Spiderman No way Home"
-    location = "Mumbai"
-    date = "16/12/2021"
-    cinema_type = "carnival"
+    details = get_details()
+    movie_name = details[0]
+    location = details[1]
+    date = details[2]
+    cinema_type = details[3]
+    # movie_name = "Spiderman No way Home"
+    # location = "Mumbai"
+    # date = "16/12/2021"
+    # cinema_type = "carnival"
     main(movie_name, location, date, cinema_type)
 
 
