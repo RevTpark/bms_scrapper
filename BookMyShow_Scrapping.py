@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from time import sleep
+from time import localtime, sleep
 import winsound
 import difflib
 import re
@@ -15,7 +15,7 @@ from requests.api import get
 
 codes = {
     "mumbai": "mumbai",
-    "national captial region": "ncr",
+    "national-capital-region-ncr": "ncr",
     "bengaluru": "bang",
     "hyderabad": "hyd",
     "chandigarh": "chd",
@@ -33,6 +33,9 @@ def main(movie_name, location, date, cinema_type):
     date_formatted = "".join(date.split("/")[::-1])
     mov_name_formatted = "-".join(movie_name.lower().split())
     movie_code = get_movie_code(base_url, location, mov_name_formatted)
+    while not movie_code:
+        movie_code = get_movie_code(base_url, location, mov_name_formatted)
+
     location_code = codes[location.lower()]
     url = base_url + f"/buytickets/{mov_name_formatted}-{location.lower()}/movie-{location_code}-{movie_code}-MT/{date_formatted}"
     
@@ -40,6 +43,7 @@ def main(movie_name, location, date, cinema_type):
     while True:
         it += 1
         r = requests.get(url, headers=headers)
+        print(url, r.url)
         if r.url == url:
             freq = 100
             dur = 50
@@ -94,7 +98,7 @@ def get_movie_code(base_url, location, mov_name_formatted):
             if bool(re.match(r"ET00[0-9]{6}", code)):
                 return code
             print("Not valid code")
-
+    
 
 def get_details():
     movie_name = input("Enter Movie Name\n- Only Spaces no Special Characters\n")
@@ -116,9 +120,12 @@ if __name__ == "__main__":
     date = details[2]
     cinema_type = details[3]
     # movie_name = "Spider man No way Home"
-    # location = "kochi"
+    # location = "mumbai"
     # date = "16/12/2021"
     # cinema_type = "carnival"
-    # main(movie_name, location, date, cinema_type)
+
+    if location.lower() == "national capital region":
+        location = "-".join(location.lower().split()) + "-ncr"
+    main(movie_name, location, date, cinema_type)
 
 
