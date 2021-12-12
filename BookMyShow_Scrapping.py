@@ -43,7 +43,7 @@ def main(movie_name, location, date, cinema_type):
     while True:
         it += 1
         r = requests.get(url, headers=headers)
-        print(url, r.url)
+        # print(url, r.url)
         if r.url == url:
             freq = 100
             dur = 50
@@ -61,25 +61,38 @@ def main(movie_name, location, date, cinema_type):
                 venue_name = venue.text.translate(translator)
                 if venue_name.split()[0].rstrip(":").lower() == cinema_type.lower():
                     print(base_url + venue.find("a", {"class": "__venue-name"})["href"])
-                    return
+            return
         print("Iteration", it)
         sleep(15)
 
 
-def get_movie_code(base_url, location, mov_name_formatted):
-    print("Getting movie code...")
-    url = base_url + f"/explore/upcoming-movies-{location}?referrerBase=movies"
+def find_code(url, res, mov_name_formatted):
     r = requests.get(url)
     soup = BeautifulSoup(r.content, "html.parser")
     movies_list = soup.find_all("a", {"class": "commonStyles__LinkWrapper-sc-133848s-11"})
-    res = {}
     for movies in  movies_list:
         link = movies["href"].split("/")
         if len(link) > 1:
             res[link[-2]] = link[-1]
             if link[-2] == mov_name_formatted:
                 return link[-1]
+    return -1
 
+
+def get_movie_code(base_url, location, mov_name_formatted):
+    res = {}
+    print("Getting movie code...")
+    url = base_url + f"/explore/upcoming-movies-{location}?referrerBase=movies"
+    movie_code = find_code(url, res, mov_name_formatted)
+    if movie_code != -1:
+        return movie_code
+    
+    url = base_url + f"/explore/movies-{location}"
+    movie_code = find_code(url, res, mov_name_formatted)
+    # print(res)
+    if movie_code != -1:
+        return movie_code
+    
     print("Movie code not found! Getting closest matches....")
     matches = difflib.get_close_matches(mov_name_formatted, res.keys(), cutoff=0.8)
     if len(matches) > 0:
@@ -98,6 +111,7 @@ def get_movie_code(base_url, location, mov_name_formatted):
             if bool(re.match(r"ET00[0-9]{6}", code)):
                 return code
             print("Not valid code")
+
     
 
 def get_details():
